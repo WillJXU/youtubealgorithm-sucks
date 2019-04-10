@@ -30,6 +30,6 @@ class searchalgo
   private:
   int videocount;
   int videowatched;
-  videoll watchedvideo[];
+  vector <videoll> watchedvideo;
   int keywordcount;
 }
