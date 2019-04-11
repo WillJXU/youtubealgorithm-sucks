@@ -6,8 +6,8 @@ struct keywordsbst
     videoll *head = NULL; //points to head of the list
     string keyword; //node keyword
     keywordsbst *parent = NULL;
-    keywordsbst *leftchild = NULL;
-    keywordsbst *rightchild = NULL;
+    keywordsbst *l = NULL;
+    keywordsbst *r = NULL;
 }
 
 struct videoll
@@ -28,7 +28,7 @@ class searchalgo
   searchalgo(std::string filename);   //constructor, builds bst
   ~searchalgo();    //deconstructor
   string getkeywords(std::string videotitle, std::string keywordTab[]);
-  videoll *getsuggestions(std::string keywordTab[]);
+  videoll *getsuggestions(vector <std::string> keywordTab);
   void getstopwords();  //constructs array of stop words
   private:
   int videocount;
