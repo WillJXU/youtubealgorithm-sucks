@@ -101,3 +101,39 @@ searchalgo::searchalgo(string filename)
       }
   }
 }
+
+
+void searchalgo::getstopwords(std::string filename){
+	std::ifstream f;
+	f.open(filename);
+	std::string s;
+	while (getline(f,s)){
+		int index = ((s[0]>=97)*s[0]+(s[0]<97)*(s[0]+32))-97;
+		std::cout<<"Inserting Stop word: '"<<s <<"' in hash #"<<index<<std::endl;
+		ignoreWord* iW = new ignoreWord;
+		iW->word = s;
+		iW->next = stopWordHash[index];
+		stopWordHash[index] = iW;
+	}
+}
+bool searchalgo::isStopWord(std::string s){
+	for (int i = 0;i<s.length();i++){
+		s[i] = ((s[i]>=97)*s[i]+(s[i]<97)*(s[i]+32));
+	}
+	int index = ((s[0]>=97)*s[0]+(s[0]<97)*(s[0]+32))-97;
+	std::cout<<s<<": searching in "<<index<<" hash"<<std::endl;
+	ignoreWord* head= stopWordHash[index];
+	if (head == NULL){
+		return false;
+	}
+	bool found = false;
+	while (head!= NULL) {
+		std::cout<<s<<std::endl;
+		if (head->word == s){
+			found = true;
+			break;
+		}
+		head = head->next;
+	}
+	return found;
+}
