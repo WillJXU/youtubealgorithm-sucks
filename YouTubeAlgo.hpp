@@ -22,6 +22,11 @@ struct videoll
     struct videoll *next;
 }
 
+struct ignoreWord{
+    std::string word = "";
+    ignoreWord* next = NULL;
+}
+
 class searchalgo
 {
   public:
@@ -40,5 +45,6 @@ class searchalgo
   int keywordcount;
   keywordsbst *root;    //bst root
   videoll* VideoHash[26];
+  ignoreWord* stopWordHash[26];
 }
 #endif
