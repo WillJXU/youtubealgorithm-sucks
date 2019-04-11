@@ -1,14 +1,14 @@
-#include YOUTUBEALGO_HPP
+#ifndef YOUTUBEALGO_HPP
 #define YOUTUBEALGO_HPP
 
 struct keywordsbst
 {
-    videoll *head = NULL; //points to head of the list
     string keyword; //node keyword
     keywordsbst *parent = NULL;
     keywordsbst *l = NULL;
     keywordsbst *r = NULL;
-}
+    videoll* head = NULL; //points to head of the list
+};
 
 struct videoll
 {
@@ -20,19 +20,22 @@ struct videoll
     int duration;
     int usersubs;
     struct videoll *next;
-}
+};
 
 struct ignoreWord{
     std::string word = "";
     ignoreWord* next = NULL;
-}
+};
 
 class searchalgo
 {
   public:
-  searchalgo(std::string filename);   //constructor, builds bst
+  //BEN
+  searchalgo(std::string filename);   //constructor, reads data from file
   ~searchalgo();    //deconstructor
+  void addkeyword(string keyword);    //adds keyword nodes to BST
   string getkeywords(std::string videotitle, std::string keywordTab[]);
+  //WILLIAM
   videoll *getsuggestions(vector <std::string> keywordTab); // Goes through the bst and finds best suggestions
   //Helpers
   videoll* getVideoPointer(std::string title); // Returns the pointer of a videoll through title
@@ -47,5 +50,5 @@ class searchalgo
   keywordsbst *root;    //bst root
   videoll* VideoHash[26];
   ignoreWord* stopWordHash[26];
-}
+};
 #endif
