@@ -29,6 +29,9 @@ class searchalgo
   ~searchalgo();    //deconstructor
   string getkeywords(std::string videotitle, std::string keywordTab[]);
   videoll *getsuggestions(vector <std::string> keywordTab);
+  //Helpers
+  videoll* getVideoPointer();
+  keywordbst* getKeyWordPoint();  
   void getstopwords();  //constructs array of stop words
   private:
   int videocount;
