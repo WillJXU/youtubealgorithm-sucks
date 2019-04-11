@@ -3,8 +3,11 @@
 
 struct keywordsbst
 {
+    videoll *head = NULL; //points to head of the list
     string keyword; //node keyword
-    videoll *head; //points to head of the list
+    keywordsbst *parent = NULL;
+    keywordsbst *leftchild = NULL;
+    keywordsbst *rightchild = NULL;
 }
 
 struct videoll
@@ -16,7 +19,7 @@ struct videoll
     float likeratio;
     int duration;
     int usersubs;
-    videoll *next;
+    struct videoll *next;
 }
 
 class searchalgo
@@ -32,4 +35,6 @@ class searchalgo
   int videowatched;
   vector <videoll> watchedvideo;
   int keywordcount;
+  keywordsbst *root;    //bst root
 }
+#endif
