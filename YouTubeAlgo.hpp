@@ -31,7 +31,7 @@ class searchalgo
   videoll *getsuggestions(vector <std::string> keywordTab);
   //Helpers
   videoll* getVideoPointer(std::string title);
-  keywordbst* getKeyWordPoint(std::string keyword);  
+  searchalgo::getKeyWordPoint(keywordbst* root ,std::string keyword)  
   void getstopwords();  //constructs array of stop words
   private:
   int videocount;
@@ -39,5 +39,6 @@ class searchalgo
   vector <videoll> watchedvideo;
   int keywordcount;
   keywordsbst *root;    //bst root
+  videoll* VideoHash[26];
 }
 #endif
