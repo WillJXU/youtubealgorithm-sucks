@@ -14,12 +14,20 @@ struct videoll
 {
     string creator;
     string subs[80];
-    int date;
+    string date;
     string title;
     float likeratio;
     int duration;
+    int views;
     int usersubs;
+    string ID;
     struct videoll *next;
+
+    videoll(){} // default constructor
+
+    // Parametrized constructor
+    videoll(string c, string thesubs[], string d, string t, float r, int w, int v, int us, string i) : creator(c), subs(thesubs),
+      date(d), title(t), likeratio(r), duration(w), views(v), usersubs(us), ID(i), next(NULL) {}
 };
 
 struct ignoreWord{
