@@ -1,3 +1,66 @@
+bool searchalgo::findmatching(keywordsbst *n, string keyword)
+{
+	if(n->l != nullptr)
+	{
+		findmatching(n->l, keyword);
+	}
+	if(n->keyword == keyword)
+  {
+    return true;
+  }
+	if(n->r != nullptr)
+	{
+		findmatching(n->r, keyword);
+	}
+  return false;
+};
+struct videoll* addvideo(videoll *theHead, string thecreator, string thesubs[], int thedop, string thetitle, float ratio, int theduration, int theviews, int thesubcount, string theID)
+{
+		//Creator|Subscriptions|DOP|Title|Likes|Dislikes|Duration|Views|SubCount|ID
+		videoll* insertintoll = new videoll(thecreator, thesubs, thedop, thetitle, ratio, theduration, theviews, thesubcount, theID);
+		if(theHead == NULL)
+	  {
+	    theHead = insertintoll;
+	    return theHead;
+	  }
+	  else if(theHead != NULL)
+	  {
+	  	if(insertintoll->thetitle < insertintoll->thetitle)
+	    {
+	      	insertintoll->next = theHead;
+	      	return insertintoll;
+	    }
+	  	else if(theHead->next == NULL)
+	    {
+	        theHead->next = insertintoll;
+	        insertintoll->next = NULL;
+	        return theHead;
+	    }
+	    else
+	    {
+	        videoll* current = theHead;
+	        videoll* prev;
+	        videoll* traverse = theHead->next;
+	        bool placement = false;
+	        while(traverse != NULL && placement == false)
+	        {
+	            if(insertintoll->thetitle > current->thetitle)
+	            {
+	                prev = current;
+	                current = current->next;
+	                traverse = traverse->next;
+	            }
+	            else
+	            {
+	                placement = true;
+	            }
+	        }
+	        insertintoll->next = current->next;
+	        current->next = insertintoll;
+	    }
+	  }
+	  return theHead;
+};
 void searchalgo::addkeyword(string keyword)
 {
   keywordsbst *prev = nullptr;
@@ -48,21 +111,26 @@ searchalgo::searchalgo(string filename)
   {
       while(getline(data,datainput))
       {
-          stringstream s(datainput);
-          //1. KEYWORDS FOR BST
+	  stringstream s(datainput);
+          //2.1 KEYWORDS FOR BST
           getline(s,datainput,'|');
           thekeywords = datainput;
           stringstream k(thekeywords);
+          bool matchfound = false;
           while(i < 10)
           {
               getline(k,thekeywords,',');
               tempkeywords[i] = thekeywords;
-              //   NEED TO ACCOUNT FOR 
-              addkeyword(thekeywords);
-              //cout << i+1 << " : " << tempkeywords[i] << endl;
+              if(i != 0)   //only check for duplicates after the root is declared
+              {
+                matchfound = findmatching(root, thekeywords);
+              }
+              if(!matchfound)
+              {
+                addkeyword(thekeywords);
+              }
               i++;
           }
-          //dispInOrd(root);
           //2. DATA FOR LL
           getline(s,datainput,'|');
           thecreator = datainput;
