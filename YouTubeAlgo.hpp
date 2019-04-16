@@ -13,7 +13,6 @@ struct keywordsbst
 struct videoll
 {
     string creator;
-    string subs[80];
     string date;
     string title;
     float likeratio;
@@ -26,7 +25,7 @@ struct videoll
     videoll(){} // default constructor
 
     // Parametrized constructor
-    videoll(string c, string thesubs[], string d, string t, float r, int w, int v, int us, string i) : creator(c), subs(thesubs),
+    videoll(string c, string d, string t, float r, int w, int v, int us, string i) : creator(c),
       date(d), title(t), likeratio(r), duration(w), views(v), usersubs(us), ID(i), next(NULL) {}
 };
 
@@ -48,14 +47,19 @@ class searchalgo
   //Helpers
   videoll* getVideoPointer(std::string title); // Returns the pointer of a videoll through title
   searchalgo::getKeyWordPoint(keywordbst* root ,std::string keyword) // Returns pointer of a keyword node
+  bool findmatching(keywordsbst *n, string keyword); //Checks if keyword is already in the tree
   void getstopwords(std::string filename);  //constructs hashtable of stop words
   bool isStopWord(std::string word); // Checks if the word is a stop work
+  //DEBUG ONLY
+  void dispInOrd(keywordsbst *n); //prints BST, calls to printll at each node
+  void printll(videoll *n);
   private:
   int videocount; // Total number of video in archive
   int videowatched; // Number of videos seen by user
   vector <videoll> watchedvideo; //Vector of the videos seen by user in the session
   int keywordcount; // Number of Keywords
   keywordsbst *root;    //bst root
+  bool match;
   videoll* VideoHash[26];
   ignoreWord* stopWordHash[26];
 };
