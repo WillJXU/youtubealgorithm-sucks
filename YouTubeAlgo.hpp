@@ -10,28 +10,31 @@ struct keywordsbst
     videoll* head = NULL; //points to head of the list
 };
 
-struct videoll
-{
+struct videoll{
     string creator;
     string date;
     string title;
     float likeratio;
     int duration;
     int views;
-    int usersubs;
     string ID;
     struct videoll *next;
 
     videoll(){} // default constructor
 
     // Parametrized constructor
-    videoll(string c, string d, string t, float r, int w, int v, int us, string i) : creator(c),
-      date(d), title(t), likeratio(r), duration(w), views(v), usersubs(us), ID(i), next(NULL) {}
+    videoll(string c, string d, string t, float r, int w, int v, string i) : creator(c),
+      date(d), title(t), likeratio(r), duration(w), views(v), ID(i), next(NULL) {}
 };
 
 struct ignoreWord{
     std::string word = "";
     ignoreWord* next = NULL;
+};
+
+struct videokeywords
+{
+    string key;
 };
 
 class searchalgo
@@ -40,8 +43,8 @@ class searchalgo
   //BEN
   searchalgo(std::string filename);   //constructor, reads data from file
   ~searchalgo();    //deconstructor
-  void addkeyword(string keyword);    //adds keyword nodes to BST
-  string getkeywords(std::string videotitle, std::string keywordTab[]);
+  int totalvideokeywords(string videotitle); // calculates size of video keywords array
+  videokeywords* getkeywords(string videotitle, int videotitlewords);
   //WILLIAM
   videoll *getsuggestions(vector <std::string> keywordTab); // Goes through the bst and finds best suggestions
   //Helpers
@@ -56,11 +59,12 @@ class searchalgo
   private:
   int videocount; // Total number of video in archive
   int videowatched; // Number of videos seen by user
+  videokeywords* keyword; //pointer to the array of video keywords
   vector <videoll> watchedvideo; //Vector of the videos seen by user in the session
   int keywordcount; // Number of Keywords
   keywordsbst *root;    //bst root
   bool match;
   videoll* VideoHash[26];
-  ignoreWord* stopWordHash[26];
+  ignoreWord* stopWordHash[55];
 };
 #endif
