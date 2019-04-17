@@ -27,6 +27,24 @@ void searchalgo::printll(videoll *n){
 	}
 };
 //  HELPER FUNCTIONS  //
+string convertlowercases(string keyword){
+		int length = keyword.length();
+		string lowercase = "";
+		char c;
+		for(int i = 0; i < length; i++)
+		{
+				if(isupper(keyword[i]))
+				{
+						c = tolower(keyword[i]);
+						lowercase = lowercase + c;
+				}
+				else
+				{
+					lowercase = lowercase + keyword[i];
+				}
+		}
+		return lowercase;
+};
 bool searchalgo::findmatching(keywordsbst *n, string keyword){
 	//cout << n->keyword << endl;
 	if(n->l != nullptr){
