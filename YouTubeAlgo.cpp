@@ -21,11 +21,10 @@ void searchalgo::printll(videoll *n){
 			cout << "  -Like ratio: " << traverse->likeratio << endl;
 			cout << "  -Duration: " << traverse->duration << endl;
 			cout << "  -Total views on this video: " << traverse->views << endl;
-			cout << "  -Creator's Sub Count: " << traverse->usersubs << endl;
 			cout << "  -Video ID: https://www.youtube.com/watch?v=" << traverse->ID << endl;
+			cout << endl;
 			traverse = traverse->next;
 	}
-	cout << endl;
 };
 //  HELPER FUNCTIONS  //
 bool searchalgo::findmatching(keywordsbst *n, string keyword){
@@ -97,16 +96,48 @@ bool searchalgo::isStopWord(std::string s){
 	}
 	return found;
 };
+int searchalgo::totalvideokeywords(string videotitle){
+	int videotitlewords = 0;
+	string storingkeyword = videotitle;
+	int length = storingkeyword.length();
+	for(int i = 0; i < length; i++){
+			if(storingkeyword[i] == ' '){
+					videotitlewords++;
+			}
+	}
+	videotitlewords++;
+	return videotitlewords;
+};
 //  CLASS FUNCTIONS  //
-struct videoll* addvideo(videoll *theHead, string thecreator, string thedop, string thetitle, float ratio, int theduration, int theviews, int thesubcount, string theID){
+videokeywords* searchalgo::getkeywords(string videotitle, int videotitlewords){
+		string storingkeyword = videotitle;
+		stringstream s(storingkeyword);
+		int i = 0;
+		keyword = new videokeywords[videotitlewords];
+		while(i < videotitlewords){
+			getline(s,storingkeyword,' ');
+			bool stopcheck = isStopWord(storingkeyword);
+			if(!stopcheck){
+				keyword[i].key = storingkeyword;
+			}
+			i++;
+		}
+		/*
+		for(int i = 0; i < videotitlewords; i++){
+				cout << keyword[i].key << endl;
+		}
+		*/
+		return keyword;
+};
+struct videoll* addvideo(videoll *theHead, string thecreator, string thedop, string thetitle, float ratio, int theduration, int theviews, string theID){
 		//Creator|Subscriptions|DOP|Title|Likes|Dislikes|Duration|Views|SubCount|ID
-		videoll* insertintoll = new videoll(thecreator, thedop, thetitle, ratio, theduration, theviews, thesubcount, theID);
+		videoll* insertintoll = new videoll(thecreator, thedop, thetitle, ratio, theduration, theviews, theID);
 		//if LL is empty
-	  if(theHead == NULL){
+		if(theHead == NULL){
 	    theHead = insertintoll;
 	    return theHead;
 	  }
-	  //if LL is not empty
+		//if LL is not empty
 	  else if(theHead != NULL){
 	  	if(insertintoll->title < insertintoll->title){
 	      	insertintoll->next = theHead;
@@ -167,87 +198,120 @@ void searchalgo::addkeyword(string keyword){
 		newkeyword->parent = prev;
 	}
 };
+string wordhelper(string keyword){
+		string word = "";
+		if(keyword[0] == ' ')
+		{
+			int length = keyword.length();
+			bool removefrontspace = false;
+			for(int i=0;i<length;i++)
+			{
+					if(i != 0)
+					{
+							word = word + keyword[i];
+					}
+			}
+			return word;
+		}
+		else
+		{
+			return keyword;
+		}
+};
 searchalgo::searchalgo(string filename){
   // 1. SET PRIVATE MEMBER DEFAULTS  //
   root = NULL;
   videocount = 0;
-videowatched = 0;
+	videowatched = 0;
   keywordcount = 0;
-match = false;
-//getstopwords("YTignoreWords.txt");
+	match = false;
+	getstopwords("YTignoreWords.txt");
   // 2. READ IN THE FILE  //
   ifstream data;
   data.open(filename);
-  //Data: Keywords|Creator|DOP|Title|Likes|Dislikes|Duration|Views|SubCount|ID
-  string datainput, thekeywords, thecreator, thedop, thetitle, thelikes, thedislikes, theduration, theviews, thesubcount, theID;
-  string tempkeywords[10];
-  int i = 0;
-bool matchfound;
-bool setroot = false;
+	//int getlinecounter = 0;
+  //Data: Keywords|Creator|DOP|Title|Likes|Dislikes|Duration|Views|ID
+  string datainput, thekeywords, thecreator, thedop, thetitle, thelikes, thedislikes, theduration, theviews, theID;
+  string tempkeywords[100];
+	bool matchfound;
+	bool setroot = false;
   if(data.is_open()){
-	//while there is data to read
+			//while there is data to read
       while(getline(data,datainput)){
+					int i = 0;
+					int j = 1;
           stringstream s(datainput);
           //2.1 KEYWORDS FOR BST
-          getline(s,datainput,'|');
+          getline(s,datainput,'"');
+					getline(s,datainput,'"');
           thekeywords = datainput;
-          stringstream k(thekeywords);
-	      for(int i = 0; i < 10; i++){
-              getline(k,thekeywords,',');
-		if(thekeywords != ""){
-			bool stopcheck = isStopWord(thekeywords);
-			if(!stopcheck){
-				tempkeywords[i] = thekeywords;
-				//set the root if root is NULL
-				if(setroot == false){
-					addkeyword(thekeywords);
-					setroot = true;
-				}
-				else{
-					matchfound = findmatching(root, thekeywords);
-					//IF a match is not found, add it to the LL
-					if(!matchfound){
-						if(thekeywords != ""){
-							addkeyword(thekeywords);
-						}
+					//cout << thekeywords << endl;
+					stringstream k(thekeywords);
+					while(i < j){
+							getline(k,thekeywords,',');
+							if(thekeywords[0] == ' ')
+							{
+									thekeywords = wordhelper(thekeywords);
+							}
+							//cout << thekeywords << endl;
+							if(thekeywords != ""){
+								thekeywords = convertlowercases(thekeywords);
+								bool stopcheck = isStopWord(thekeywords);
+								if(!stopcheck){
+									tempkeywords[i] = thekeywords;
+									//set the root if root is NULL
+									if(setroot == false){
+										addkeyword(thekeywords);
+										setroot = true;
+				          }
+									else{
+											matchfound = findmatching(root, thekeywords);
+											//IF a match is not found, add it to the LL
+											if(!matchfound){
+												if(thekeywords != ""){
+													addkeyword(thekeywords);
+												}
+											}
+									}
+									thekeywords = "";
+									match = false;		//Sets match used in findmatching() to false for next word
+									j++;
+									}
+							}
+							i++;
 					}
-				}
-				thekeywords = "";		//Sets thekeywords to empty string in case there are not a total of 10 keywords
-				match = false;		//Sets match used in findmatching() to false for next word
-			}
-	}
-	      }
           //2.2 DATA FOR LL
-          getline(s,datainput,'|');
+          getline(s,datainput,',');
+					getline(s,datainput,',');
           thecreator = datainput;
-          getline(s,datainput,'|');
+          getline(s,datainput,',');
           thedop = datainput;
-          getline(s,datainput,'|');
+					getline(s,datainput,',');
           thetitle = datainput;
-          getline(s,datainput,'|');
+          getline(s,datainput,',');
           thelikes = datainput;
-	  getline(s,datainput,'|');
+					getline(s,datainput,',');
           thedislikes = datainput;
-	  float ratio = ((stof(thelikes) / (stof(thelikes) + stof(thedislikes))) * 100);
-          getline(s,datainput,'|');
+					float ratio = ((stof(thelikes) / (stof(thelikes) + stof(thedislikes))) * 100);
+          getline(s,datainput,',');
           theduration = datainput;
-          getline(s,datainput,'|');
+					getline(s,datainput,',');
           theviews = datainput;
-          getline(s,datainput,'|');
-          thesubcount = datainput;
-          getline(s,datainput);
+					getline(s,datainput);
           theID = datainput;
-	//2.3 INSERT FOR LL
-	for(int i = 0; i < 10; i++){
-	//if the word is not an empty string
-		if(tempkeywords[i] != ""){
-			keywordsbst *nodeptr = findnode(root, tempkeywords[i]);	//find the bstNode equal to the keyword
-			//below, the function adds the information to the ll and returns the head ptr of the ll at that node
-			nodeptr->head = addvideo(nodeptr->head, thecreator, thedop, thetitle, ratio, stoi(theduration), stoi(theviews), stoi(thesubcount), theID);
-		}
-		tempkeywords[i] = "";			//sets tempkeyword to empty string since it is no longer needed
-      	}
-  	}
+					//2.3 INSERT FOR LL
+					for(int i = 0; i < j; i++){
+						//if the word is not an empty string
+						if(tempkeywords[i] != ""){
+								keywordsbst *nodeptr = findnode(root, tempkeywords[i]);					//find the bstNode equal to the keyword
+								//below, the function adds the information to the ll and returns the head ptr of the ll at that node
+								nodeptr->head = addvideo(nodeptr->head, thecreator, thedop, thetitle, ratio, stoi(theduration), stoi(theviews), theID);
+						}
+						tempkeywords[i] = "";			//sets tempkeyword to empty string since it is no longer needed
+      		}
+					//getlinecounter++;
+					//cout << getlinecounter << endl;
+  		}
 	}
 	data.close();
 	dispInOrd(root);		//DEBUG ONLY: Shows the BST and LL of Each Node
