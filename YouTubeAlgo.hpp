@@ -43,6 +43,7 @@ class searchalgo
   //BEN
   searchalgo(std::string filename);   //constructor, reads data from file
   ~searchalgo();    //deconstructor
+  void addkeyword(string keyword);
   int totalvideokeywords(string videotitle); // calculates size of video keywords array
   videokeywords* getkeywords(string videotitle, int videotitlewords);
   //WILLIAM
