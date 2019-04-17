@@ -1,15 +1,6 @@
 #ifndef YOUTUBEALGO_HPP
 #define YOUTUBEALGO_HPP
 
-struct keywordsbst
-{
-    string keyword; //node keyword
-    keywordsbst *parent = NULL;
-    keywordsbst *l = NULL;
-    keywordsbst *r = NULL;
-    videoll* head = NULL; //points to head of the list
-};
-
 struct videoll{
     string creator;
     string date;
@@ -25,6 +16,15 @@ struct videoll{
     // Parametrized constructor
     videoll(string c, string d, string t, float r, int w, int v, string i) : creator(c),
       date(d), title(t), likeratio(r), duration(w), views(v), ID(i), next(NULL) {}
+};
+
+struct keywordsbst
+{
+    string keyword; //node keyword
+    keywordsbst *parent = NULL;
+    keywordsbst *l = NULL;
+    keywordsbst *r = NULL;
+    videoll* head = NULL; //points to head of the list
 };
 
 struct ignoreWord{
