@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include<vector>
+using namespace std;
 
 struct videoll{
     string creator;
