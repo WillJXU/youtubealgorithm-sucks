@@ -1,5 +1,10 @@
 #ifndef YOUTUBEALGO_HPP
 #define YOUTUBEALGO_HPP
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <fstream>
+#include<vector>
 
 struct videoll{
     string creator;
