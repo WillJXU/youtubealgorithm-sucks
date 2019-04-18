@@ -56,7 +56,7 @@ class searchalgo
   videoll *getsuggestions(vector <std::string> keywordTab); // Goes through the bst and finds best suggestions
   //Helpers
   videoll* getVideoPointer(std::string title); // Returns the pointer of a videoll through title
-  keywordsbst* getKeyWordPoint(keywordsbst* root ,std::string keyword) // Returns pointer of a keyword node
+  keywordsbst* getKeyWordPoint(keywordsbst* root ,std::string keyword); // Returns pointer of a keyword node
   bool findmatching(keywordsbst *n, string keyword); //Checks if keyword is already in the tree
   void getstopwords(std::string filename);  //constructs hashtable of stop words
   bool isStopWord(std::string word); // Checks if the word is a stop work
