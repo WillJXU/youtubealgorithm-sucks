@@ -1,4 +1,5 @@
 //  FOR DEBUGGING ONLY  //
+#include "YoutubeAlgo.hpp"
 void searchalgo::dispInOrd(keywordsbst *n){
 	//prints BST Nodes (In Order)
 	if(n->l != nullptr){
@@ -81,12 +82,15 @@ keywordsbst* findnode(keywordsbst *rootPtr, string keyword){
     return ptr;
 };
 void searchalgo::getstopwords(std::string filename){
+	for (int i = 0;i<26;i++){
+		stopWordHash[i] = NULL;
+	}
 	std::ifstream f;
 	f.open(filename);
 	std::string s;
 	while (getline(f,s)){
 		int index = ((s[0]>=97)*s[0]+(s[0]<97)*(s[0]+32))-97;
-		std::cout<<"Inserting Stop word: '"<<s <<"' in hash #"<<index<<std::endl;
+		//std::cout<<"Inserting Stop word: '"<<s <<"' in hash #"<<index<<std::endl;
 		ignoreWord* iW = new ignoreWord;
 		iW->word = s;
 		iW->next = stopWordHash[index];
@@ -98,14 +102,14 @@ bool searchalgo::isStopWord(std::string s){
 		s[i] = ((s[i]>=97)*s[i]+(s[i]<97)*(s[i]+32));
 	}
 	int index = ((s[0]>=97)*s[0]+(s[0]<97)*(s[0]+32))-97;
-	std::cout<<s<<": searching in "<<index<<" hash"<<std::endl;
+	//std::cout<<s<<": searching in "<<index<<" hash"<<std::endl;
 	ignoreWord* head= stopWordHash[index];
 	if (head == NULL){
 		return false;
 	}
 	bool found = false;
 	while (head!= NULL) {
-		std::cout<<s<<std::endl;
+		//std::cout<<s<<std::endl;
 		if (head->word == s){
 			found = true;
 			break;
@@ -148,47 +152,47 @@ videokeywords* searchalgo::getkeywords(string videotitle, int videotitlewords){
 		return keyword;
 };
 struct videoll* addvideo(videoll *theHead, string thecreator, string thedop, string thetitle, float ratio, int theduration, int theviews, string theID){
-		//Creator|Subscriptions|DOP|Title|Likes|Dislikes|Duration|Views|SubCount|ID
-		videoll* insertintoll = new videoll(thecreator, thedop, thetitle, ratio, theduration, theviews, theID);
-		//if LL is empty
-		if(theHead == NULL){
-	    theHead = insertintoll;
-	    return theHead;
-	  }
-		//if LL is not empty
-	  else if(theHead != NULL){
-	  	if(insertintoll->title < insertintoll->title){
-	      	insertintoll->next = theHead;
+	//Creator|Subscriptions|DOP|Title|Likes|Dislikes|Duration|Views|SubCount|ID
+	videoll* insertintoll = new videoll(thecreator, thedop, thetitle, ratio, theduration, theviews, theID);
+	//if LL is empty
+	if(theHead == NULL){
+		theHead = insertintoll;
+	    	return theHead;
+	}
+	//if LL is not empty
+	else if(theHead != NULL){
+		if(insertintoll->title < insertintoll->title){
+      		insertintoll->next = theHead;
 	      	return insertintoll;
-	    }
+	   	}
 	  	else if(theHead->next == NULL){
 	        theHead->next = insertintoll;
 	        insertintoll->next = NULL;
 	        return theHead;
-	    }
-	    else{
-	        videoll* current = theHead;
-	        videoll* prev;
-	        videoll* traverse = theHead->next;
-	        bool placement = false;
-	        while(traverse != NULL && placement == false){
-	            if(insertintoll->title > current->title){
-	                prev = current;
-	                current = current->next;
-	                traverse = traverse->next;
-	            }
-	            else{
-	                placement = true;
-	            }
-	        }
-	        insertintoll->next = current->next;
-	        current->next = insertintoll;
-	    }
-	  }
-	  return theHead;
+	    	}
+	    	else{
+	        	videoll* current = theHead;
+	        	videoll* prev;
+	        	videoll* traverse = theHead->next;
+	        	bool placement = false;
+	        	while(traverse != NULL && placement == false){
+	            	if(insertintoll->title > current->title){
+	                	prev = current;
+	                	current = current->next;
+	                	traverse = traverse->next;
+	            	}
+	            	else{
+	                	placement = true;
+	            	}
+	        	}
+	        	insertintoll->next = current->next;
+	        	current->next = insertintoll;
+	    	}
+	}
+	return theHead;
 };
 void searchalgo::addkeyword(string keyword){
-  keywordsbst *prev = nullptr;
+  	keywordsbst *prev = nullptr;
 	keywordsbst *temp = root;
 	keywordsbst *newkeyword = new keywordsbst;
 	newkeyword->keyword = keyword;
@@ -216,6 +220,20 @@ void searchalgo::addkeyword(string keyword){
 		newkeyword->parent = prev;
 	}
 };
+int removeDupWord(string str){
+   	string word = "";
+   	for (auto x : str){
+    		if (x == ' ') {
+           	cout << word << endl;
+           	word = "";
+       	}
+       	else
+       	{
+           	word = word + x;
+       	}
+   	}
+   	cout << word << endl;
+}
 string wordhelper(string keyword){
 		string word = "";
 		if(keyword[0] == ' ')
@@ -237,100 +255,438 @@ string wordhelper(string keyword){
 		}
 };
 searchalgo::searchalgo(string filename){
-  // 1. SET PRIVATE MEMBER DEFAULTS  //
-  root = NULL;
-  videocount = 0;
+	for (int i = 0;i<57;i++){
+		VideoHash[i] = NULL;
+	}
+ 	// 1. SET PRIVATE MEMBER DEFAULTS  //
+  	root = NULL;
+  	videocount = 0;
 	videowatched = 0;
-  keywordcount = 0;
+  	keywordcount = 0;
 	match = false;
-	getstopwords("YTignoreWords.txt");
-  // 2. READ IN THE FILE  //
-  ifstream data;
-  data.open(filename);
+	getstopwords("ignoreWords.txt");
+  	// 2. READ IN THE FILE  //
+  	ifstream data;
+  	data.open(filename);
 	//int getlinecounter = 0;
-  //Data: Keywords|Creator|DOP|Title|Likes|Dislikes|Duration|Views|ID
-  string datainput, thekeywords, thecreator, thedop, thetitle, thelikes, thedislikes, theduration, theviews, theID;
-  string tempkeywords[100];
+  	//Data: Keywords|Creator|DOP|Title|Likes|Dislikes|Duration|Views|ID
+  	string datainput, thekeywords, thecreator, thedop, thetitle, thelikes, thedislikes, theduration, theviews, theID;
+  	string tempkeywords[100];
 	bool matchfound;
 	bool setroot = false;
-  if(data.is_open()){
-			//while there is data to read
-      while(getline(data,datainput)){
-					int i = 0;
-					int j = 1;
-          stringstream s(datainput);
-          //2.1 KEYWORDS FOR BST
-          getline(s,datainput,'"');
-					getline(s,datainput,'"');
-          thekeywords = datainput;
-					//cout << thekeywords << endl;
-					stringstream k(thekeywords);
-					while(i < j){
-							getline(k,thekeywords,',');
-							if(thekeywords[0] == ' ')
-							{
-									thekeywords = wordhelper(thekeywords);
-							}
-							//cout << thekeywords << endl;
-							if(thekeywords != ""){
-								thekeywords = convertlowercases(thekeywords);
-								bool stopcheck = isStopWord(thekeywords);
-								if(!stopcheck){
-									tempkeywords[i] = thekeywords;
-									//set the root if root is NULL
-									if(setroot == false){
-										addkeyword(thekeywords);
-										setroot = true;
+ 	if(data.is_open()){
+	//while there is data to read
+	 	while(getline(data,datainput)){
+			int i = 0;
+			int j = 1;
+	          stringstream s(datainput);
+	          //2.1 KEYWORDS FOR BST
+//int p;
+//std::cin >> p;
+//std::cout << datainput << '\n';
+	          getline(s,datainput,'"');
+//std::cout << datainput << '\n';
+//std::cin >> p;
+			getline(s,datainput,'"');
+//std::cout << datainput << '\n';
+//std::cin >> p;
+	          thekeywords = datainput;
+			//cout << thekeywords << endl;
+			stringstream k(thekeywords);
+			while(i < j){
+				getline(k,thekeywords,',');
+				if(thekeywords[0] == ' '){
+					thekeywords = wordhelper(thekeywords);
+				}
+				//cout << thekeywords << endl;
+				if(thekeywords != ""){
+					thekeywords = convertlowercases(thekeywords);
+					bool stopcheck = isStopWord(thekeywords);
+					if(!stopcheck){
+						tempkeywords[i] = thekeywords;
+						//set the root if root is NULL
+						if(setroot == false){
+							addkeyword(thekeywords);
+							setroot = true;
 				          }
-									else{
-											matchfound = findmatching(root, thekeywords);
-											//IF a match is not found, add it to the LL
-											if(!matchfound){
-												if(thekeywords != ""){
-													addkeyword(thekeywords);
-												}
-											}
-									}
-									thekeywords = "";
-									match = false;		//Sets match used in findmatching() to false for next word
-									j++;
-									}
+						else{
+							matchfound = findmatching(root, thekeywords);
+							//IF a match is not found, add it to the LL
+							if(!matchfound){
+								if(thekeywords != ""){
+									addkeyword(thekeywords);
+									//Split keywords into component
+								}
 							}
-							i++;
-					}
-          //2.2 DATA FOR LL
-          getline(s,datainput,',');
-					getline(s,datainput,',');
-          thecreator = datainput;
-          getline(s,datainput,',');
-          thedop = datainput;
-					getline(s,datainput,',');
-          thetitle = datainput;
-          getline(s,datainput,',');
-          thelikes = datainput;
-					getline(s,datainput,',');
-          thedislikes = datainput;
-					float ratio = ((stof(thelikes) / (stof(thelikes) + stof(thedislikes))) * 100);
-          getline(s,datainput,',');
-          theduration = datainput;
-					getline(s,datainput,',');
-          theviews = datainput;
-					getline(s,datainput);
-          theID = datainput;
-					//2.3 INSERT FOR LL
-					for(int i = 0; i < j; i++){
-						//if the word is not an empty string
-						if(tempkeywords[i] != ""){
-								keywordsbst *nodeptr = findnode(root, tempkeywords[i]);					//find the bstNode equal to the keyword
-								//below, the function adds the information to the ll and returns the head ptr of the ll at that node
-								nodeptr->head = addvideo(nodeptr->head, thecreator, thedop, thetitle, ratio, stoi(theduration), stoi(theviews), theID);
 						}
-						tempkeywords[i] = "";			//sets tempkeyword to empty string since it is no longer needed
-      		}
+						thekeywords = "";
+						match = false;		//Sets match used in findmatching() to false for next word
+						j++;
+					}
+				}
+				i++;
+			}
+	          //2.2 DATA FOR LL
+	          getline(s,datainput,',');
+			getline(s,datainput,',');
+	          thecreator = datainput;
+	          	getline(s,datainput,',');
+	          thedop = datainput;
+				getline(s,datainput,',');
+	          thetitle = datainput;
+	          	getline(s,datainput,',');
+	          thelikes = datainput;
+				getline(s,datainput,',');
+	          thedislikes = datainput;
+			float ratio = ((stof(thelikes) / (stof(thelikes) + stof(thedislikes))) * 100);
+	          	getline(s,datainput,',');
+	          theduration = datainput;
+				getline(s,datainput,',');
+	          theviews = datainput;
+				getline(s,datainput);
+	          theID = datainput;
+			//2.3 INSERT FOR LL
+			for(int i = 0; i < j; i++){
+				//if the word is not an empty string
+				if(tempkeywords[i] != ""){
+					keywordsbst *nodeptr = findnode(root, tempkeywords[i]);					//find the bstNode equal to the keyword
+					//below, the function adds the information to the ll and returns the head ptr of the ll at that node
+					nodeptr->head = addvideo(nodeptr->head, thecreator, thedop, thetitle, ratio, stoi(theduration), stoi(theviews), theID);
+				}
+				tempkeywords[i] = "";			//sets tempkeyword to empty string since it is no longer needed
+			}
 					//getlinecounter++;
 					//cout << getlinecounter << endl;
   		}
 	}
 	data.close();
-	dispInOrd(root);		//DEBUG ONLY: Shows the BST and LL of Each Node
+	//dispInOrd(root);		//DEBUG ONLY: Shows the BST and LL of Each Node
 };
+
+int* traverseKeyword(keywordsbst* root, int* count){
+	if (root ==NULL){
+		return count;
+	}
+	traverseKeyword(root->r,count);
+	std::cout << root->keyword << '\n';
+	(*count)++;
+	traverseKeyword(root->l,count);
+	return count;
+}
+
+bool alph(std::string a, std::string b ){
+	std::string word[2] = {a,b};
+	//std::cout << a<<" vs. "<< b << '\n';
+	bool small = (a.length()>b.length());
+	for (int i =0;i<word[small].length();i++){
+		if (a[i] == b[i]){
+			continue;
+		}
+		//std::cout <<word[(a[i]>b[i])] <<" comes first" << '\n';
+		return (a[i]>b[i]);
+	}
+	//std::cout <<word[small] <<" comes first" << '\n';
+	return small;
+}
+
+keywordsbst* searchalgo::getKeyWordPoint(std::string keyword){
+	//std::cout << "finding keyword "<<keyword << '\n';
+	keywordsbst* check = root;
+	while (check != NULL) {
+		if (check->keyword == keyword){
+			return check;
+		}
+		if (alph(keyword, check->keyword)){
+			check = check->r;
+			continue;
+		}
+		check = check->l;
+		continue;
+	}
+	return NULL;
+}
+
+int hashreturn(std::string s){
+	return (s.length()+s[0]+s[s.length()])%57;
+}
+
+bool priorityFirst(vid* a, vid* b){
+	if (a->count == b->count){
+		return (a->recScore > b->recScore);
+	}
+	return (a->count> b->count);
+}
+void clearscreen(){
+	for (int i = 0;i<100;i++){
+		std::cout << "" << '\n';
+	}
+}
+void searchalgo::printmenu(){
+	clearscreen();
+	vid* check = queue;
+	std::cout << "[[List of recommended videos]]" << '\n';
+	int c = 0;
+	while ((check!=NULL)&& (vidrecco>c)){
+		std::cout << "" << '\n';
+		std::cout << c+1<<". "<<check->title << " By "<<check->refNode->creator<<" ["<< check->recScore<<"]"<< '\n';
+		std::cout << "https://www.youtube.com/watch?v="<<check->refNode->ID << '\n';
+		check = check->n;
+		c++;
+	}
+	std::cout << " _______________________________" << '\n';
+	std::cout << "| 1. Watch                      |" << '\n';
+	std::cout << "| 2. Read Detail                |" << '\n';
+	std::cout << "| 3. Change # of recommendation |" << '\n';
+	std::cout << "| 4. Quit                       |" << '\n';
+}
+
+void searchalgo::printVideoDetail(vid* check){
+	std::cout << "_____________________________________________________________" << '\n';
+	std::cout << check->title << " By "<<check->refNode->creator<< '\n';
+	std::cout << ">Recommendation stats" << '\n';
+	std::cout << ">> Number of Keyword match: "<< check->count << '\n';
+	std::cout << ">> Recommendation Score   : "<< check->recScore << '\n';
+	std::cout << "Video stats" << '\n';
+	std::cout << ">>Date Published          :"<< check->refNode->date << '\n';
+	std::cout << ">> View count             :"<< check->refNode->views<< '\n';
+	std::cout << ">> Like ratio             :"<< check->refNode->likeratio << '\n';
+	std::cout << ">> Duration               :"<< check->refNode->duration << '\n';
+	std::cout << "_____________________________________________________________" << '\n';
+}
+videoll* searchalgo::getsuggestions(std::vector<std::string> v){
+	std::cout << "getting suggestions" << '\n';
+	for (int i = 0;i<57;i++){
+		//std::cout << i << '\n';
+		VideoHash[i] = NULL;
+	}
+	int numOfVid = 0;
+	//std::cout << v.size() << '\n';
+	for (int i = 0; i<v.size();i++){
+		std::cout << "Getting keywordbst pointer for "<<v[i] << '\n';
+		keywordsbst* keynode =  getKeyWordPoint(v[i]);
+		if (keynode == 0){
+			std::cout << "Keyword doesn't exist in library" << '\n';
+			continue;
+		}
+		std::cout << "Found keyword address in "<<keynode << '\n';
+		videoll* check = keynode->head;
+		while (check != NULL){
+			int index = hashreturn(check->title);
+			vid* llcheck = VideoHash[index];
+			vid* found = NULL;
+			while (llcheck !=NULL) {
+				if (llcheck->title == check->title){
+					std::cout << "		found!" << '\n';
+					found = llcheck;
+					break;
+				}
+				llcheck = llcheck->n;
+			}
+			if (found!= NULL){
+				(found->count)++;
+			}
+			else{
+				vid* newvid = new vid;
+				newvid->title = check->title;
+				newvid->count = 1;
+				newvid-> recScore = check->likeratio* log(check->views);
+				newvid->n = VideoHash[index];
+				VideoHash[index] = newvid;
+				newvid -> refNode = check;
+				std::cout << "Adding video to node" << '\n';
+				std::cout << "     > "<<newvid->title <<": recScore of "<<newvid->recScore<< '\n';
+				numOfVid++;
+			}
+			check = check->next;
+		}
+
+	}
+	int n = 0;
+	vid* tempQueue[numOfVid];
+	for (int i = 0;i<57;i++){
+		if (VideoHash[i]==NULL){
+			continue;
+		}
+		//std::cout << "     In hash no."<<i << '\n';
+		vid* point = VideoHash[i];
+		while (point!=NULL) {
+			tempQueue[n] = point;
+			std::cout << point->title << '\n';
+			n++;
+			point = point->n;
+		}
+	}
+	clearscreen();
+std::cout << "Reordering queue" << '\n';
+
+int p;
+	for (int i = 0; i < numOfVid;i++){
+		int rank = 1;
+		vid* l = queue;
+		while (l!=NULL) {
+			std::cout <<"["<<rank<<"]:"<< l->title<<" "<<l->recScore << '\n';
+			rank++;
+			l = l->n;
+		}
+		std::cin >> p;
+		vid* point = tempQueue[i];
+		std::cout << point->title << '\n';
+		std::cout << "		"<<point->count << '\n';
+		std::cout << "		"<<point->recScore << '\n';
+		point->par = NULL;
+		point->n = NULL;
+		if (queue == NULL){
+			queue = point;
+			continue;
+		}
+		vid* check = queue;
+
+		while (priorityFirst(check,point)) {
+			if (check->n == NULL){
+				break;
+			}
+			check = check->n;
+		}
+
+		if (check->n == NULL&&(priorityFirst(check,point))){
+			check->n = point;
+			std::cout << "check->n = point" << '\n';
+			point->par = check;
+			std::cout << "point->par = check" << '\n';
+			continue;
+		}
+
+		point->par = check->par;
+		std::cout << "point->par = check->par" << '\n';
+		if (check->par != NULL){
+			check->par->n = point;
+			std::cout << "check->par->n = point" << '\n';
+		}
+		else {
+			queue = point;
+			std::cout << "Made into new head" << '\n';
+		}
+		check->par = point;
+		std::cout << "check->par = point" << '\n';
+		point->n = check;
+		std::cout << "point->n = check" << '\n';
+	}
+	vid* check = queue;
+	clearscreen();
+	std::cout << "Suggestion Queue" << '\n';
+	while (check!=NULL){
+		printVideoDetail(check);
+		check = check->n;
+	}
+	printmenu();
+}
+void dealoctree(keywordsbst* root){
+	if (root==NULL){
+		return;
+	}
+	dealoctree(root->l);
+	dealoctree(root->r);
+	videoll* check = root->head;
+	while(check!=NULL){
+		std::cout << "Deleting video: " <<check->title << '\n';
+		root->head = check->next;
+		delete check;
+		check = root->head;
+	}
+	std::cout << "Deleting Keyword: "<<root->keyword << '\n';
+	delete root;
+}
+
+void searchalgo::printallinfo() {
+	vid* check = queue;
+	int c = 1;
+	while (check!=NULL&& (vidrecco>c)){
+		printVideoDetail(check);
+		check = check->n;
+		c++;
+	}
+}
+
+searchalgo::~searchalgo(){
+		for (int i = 0;i<57;i++){
+			if (VideoHash[i]==NULL){
+				continue;
+			}
+			std::cout << "     In hash no."<<i << '\n';
+			vid* check = VideoHash[i];
+			while (check!=NULL) {
+				std::cout << "       Title :"<<check->title << '\n';
+				std::cout << "       Count: "<<check->count << '\n';
+				delete check;
+				check = check->n;
+			}
+		}
+	dealoctree(root);
+	clearscreen();
+	std::cout << "Thanks for using suggest bot!" << '\n';
+}
+int main(int argc, char const *argv[]) {
+	searchalgo sA = searchalgo("videolist.csv");
+	int n = 0;
+	//traverseKeyword(sA.getRoot(),&n);
+	//sA.setNumofRec(stoi(argv[1]));
+	std::cout << "Reading all keywords" << '\n';
+	std::vector<std::string> v;
+	std::string key;
+	for (int i = 0;i<stoi(argv[1]);i++){
+		clearscreen();
+		std::cout << "Enter a keyword, you must enter "<<stoi(argv[1])-i<<" more" << '\n';
+		std::cout << ">";
+		getline(cin,key);
+		bool isStop = sA.isStopWord(key);
+		//std::cout << argv[i]<<" is stop word? "<< isStop << '\n';
+		if (!isStop){
+			v.push_back(key);
+		}
+	}
+	sA.getsuggestions(v);
+	int o = 0;
+	std::string s;
+	while (true) {
+		sA.printmenu();
+		cin >>o;
+		switch (o) {
+			case 1:
+				std::cout << "Watch which video?" << '\n';
+				do {
+					std::cin >> o;
+				} while(sA.getrecconum()<o);
+				s = sA.watchVidFromQueue(o);
+				std::cout << "You have viewed the video '"<<s<<"'" << '\n';
+				std::cin >> o;
+
+			break;
+			case 2:
+				std::cout << "Read which video detail? Enter 0 to print all information" << '\n';
+				do {
+					std::cin >> o;
+				} while(sA.getrecconum()<o);
+				if (o==0){
+					sA.printallinfo();
+				}
+				sA.readDetailFromQueue(o);
+				std::cin >> o;
+			break;
+			case 3:
+				std::cout << "Show how many recommendation?" << '\n';
+				do {
+					std::cin >> o;
+				} while(o<=0);
+				sA.setNumofRec(o);
+				std::cout << "The number of recommendation set to "<<o << '\n';
+				std::cin >> o;
+			break;
+			case 4:
+				return 0 ;
+			break;
+		}
+	}
+	sA.printmenu();
+	//~sA;
+	return 0;
+}
