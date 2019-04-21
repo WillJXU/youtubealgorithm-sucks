@@ -1,5 +1,5 @@
-//  FOR DEBUGGING ONLY  //
 #include "YoutubeAlgo.hpp"
+//  FOR DEBUGGING function  //
 void searchalgo::dispInOrd(keywordsbst *n){
 	//prints BST Nodes (In Order)
 	if(n->l != nullptr){
@@ -27,7 +27,7 @@ void searchalgo::printll(videoll *n){
 			traverse = traverse->next;
 	}
 };
-//  HELPER FUNCTIONS  //
+//  Non-Member HELPER FUNCTIONS  //
 string convertlowercases(string keyword){
 		int length = keyword.length();
 		string lowercase = "";
@@ -45,20 +45,6 @@ string convertlowercases(string keyword){
 				}
 		}
 		return lowercase;
-};
-bool searchalgo::findmatching(keywordsbst *n, string keyword){
-	//cout << n->keyword << endl;
-	if(n->l != nullptr){
-		findmatching(n->l, keyword);
-	}
-	if(n->keyword == keyword){
-		//cout << "found" << endl;
-		match = true;
-  }
-	if(n->r != nullptr){
-		findmatching(n->r, keyword);
-	}
-  return match;
 };
 keywordsbst* findnoderecur(keywordsbst *rootPtr , string keyword){
     keywordsbst* thekeyword = rootPtr;
@@ -81,42 +67,74 @@ keywordsbst* findnode(keywordsbst *rootPtr, string keyword){
     keywordsbst *ptr = findnoderecur(rootPtr,keyword);
     return ptr;
 };
-void searchalgo::getstopwords(std::string filename){
-	for (int i = 0;i<26;i++){
-		stopWordHash[i] = NULL;
+int* traverseKeyword(keywordsbst* root, int* count){
+	if (root ==NULL){
+		return count;
 	}
-	std::ifstream f;
-	f.open(filename);
-	std::string s;
-	while (getline(f,s)){
-		int index = ((s[0]>=97)*s[0]+(s[0]<97)*(s[0]+32))-97;
-		//std::cout<<"Inserting Stop word: '"<<s <<"' in hash #"<<index<<std::endl;
-		ignoreWord* iW = new ignoreWord;
-		iW->word = s;
-		iW->next = stopWordHash[index];
-		stopWordHash[index] = iW;
-	}
-};
-bool searchalgo::isStopWord(std::string s){
-	for (int i = 0;i<s.length();i++){
-		s[i] = ((s[i]>=97)*s[i]+(s[i]<97)*(s[i]+32));
-	}
-	int index = ((s[0]>=97)*s[0]+(s[0]<97)*(s[0]+32))-97;
-	//std::cout<<s<<": searching in "<<index<<" hash"<<std::endl;
-	ignoreWord* head= stopWordHash[index];
-	if (head == NULL){
-		return false;
-	}
-	bool found = false;
-	while (head!= NULL) {
-		//std::cout<<s<<std::endl;
-		if (head->word == s){
-			found = true;
-			break;
+	traverseKeyword(root->r,count);
+	std::cout << root->keyword << '\n';
+	(*count)++;
+	traverseKeyword(root->l,count);
+	return count;
+}
+int hashreturn(std::string s){
+	return (s.length()+s[0]+s[s.length()])%57;
+} //Hash creator
+bool alph(std::string a, std::string b ){
+	std::string word[2] = {a,b};
+	//std::cout << a<<" vs. "<< b << '\n';
+	bool small = (a.length()>b.length());
+	for (int i =0;i<word[small].length();i++){
+		if (a[i] == b[i]){
+			continue;
 		}
-		head = head->next;
+		//std::cout <<word[(a[i]>b[i])] <<" comes first" << '\n';
+		return (a[i]>b[i]);
 	}
-	return found;
+	//std::cout <<word[small] <<" comes first" << '\n';
+	return small;
+} // Determines which title appears first alphabetically
+void clearscreen(){
+	for (int i = 0;i<100;i++){
+		std::cout << "" << '\n';
+	}
+} //Clears screen of text
+bool priorityFirst(vid* a, vid* b){
+	if (a->count == b->count){
+		return (a->recScore > b->recScore);
+	}
+	return (a->count> b->count);
+} // Decides which video is prioritized in queue
+void dealoctree(keywordsbst* root){
+	if (root==NULL){
+		return;
+	}
+	dealoctree(root->l);
+	dealoctree(root->r);
+	videoll* check = root->head;
+	while(check!=NULL){
+		std::cout << "Deleting video: " <<check->title << '\n';
+		root->head = check->next;
+		delete check;
+		check = root->head;
+	}
+	std::cout << "Deleting Keyword: "<<root->keyword << '\n';
+	delete root;
+} // Post-order Traversal of BST for deallocation of data-struct
+//  Ben's shit //
+bool searchalgo::findmatching(keywordsbst *n, string keyword){
+	//cout << n->keyword << endl;
+	if(n->l != nullptr){
+		findmatching(n->l, keyword);
+	}
+	if(n->keyword == keyword){
+		//cout << "found" << endl;
+		match = true;
+  }
+	if(n->r != nullptr){
+		findmatching(n->r, keyword);
+	}
+  return match;
 };
 int searchalgo::totalvideokeywords(string videotitle){
 	int videotitlewords = 0;
@@ -130,7 +148,6 @@ int searchalgo::totalvideokeywords(string videotitle){
 	videotitlewords++;
 	return videotitlewords;
 };
-//  CLASS FUNCTIONS  //
 videokeywords* searchalgo::getkeywords(string videotitle, int videotitlewords){
 		string storingkeyword = videotitle;
 		stringstream s(storingkeyword);
@@ -220,20 +237,6 @@ void searchalgo::addkeyword(string keyword){
 		newkeyword->parent = prev;
 	}
 };
-int removeDupWord(string str){
-   	string word = "";
-   	for (auto x : str){
-    		if (x == ' ') {
-           	cout << word << endl;
-           	word = "";
-       	}
-       	else
-       	{
-           	word = word + x;
-       	}
-   	}
-   	cout << word << endl;
-}
 string wordhelper(string keyword){
 		string word = "";
 		if(keyword[0] == ' ')
@@ -338,6 +341,7 @@ searchalgo::searchalgo(string filename){
 	          thelikes = datainput;
 				getline(s,datainput,',');
 	          thedislikes = datainput;
+			std::cout << thelikes<<","<<thedislikes << '\n';
 			float ratio = ((stof(thelikes) / (stof(thelikes) + stof(thedislikes))) * 100);
 	          	getline(s,datainput,',');
 	          theduration = datainput;
@@ -362,33 +366,44 @@ searchalgo::searchalgo(string filename){
 	data.close();
 	//dispInOrd(root);		//DEBUG ONLY: Shows the BST and LL of Each Node
 };
-
-int* traverseKeyword(keywordsbst* root, int* count){
-	if (root ==NULL){
-		return count;
+// Will's Shit //
+void searchalgo::getstopwords(std::string filename){
+	for (int i = 0;i<26;i++){
+		stopWordHash[i] = NULL;
 	}
-	traverseKeyword(root->r,count);
-	std::cout << root->keyword << '\n';
-	(*count)++;
-	traverseKeyword(root->l,count);
-	return count;
-}
-
-bool alph(std::string a, std::string b ){
-	std::string word[2] = {a,b};
-	//std::cout << a<<" vs. "<< b << '\n';
-	bool small = (a.length()>b.length());
-	for (int i =0;i<word[small].length();i++){
-		if (a[i] == b[i]){
-			continue;
+	std::ifstream f;
+	f.open(filename);
+	std::string s;
+	while (getline(f,s)){
+		int index = ((s[0]>=97)*s[0]+(s[0]<97)*(s[0]+32))-97;
+		//std::cout<<"Inserting Stop word: '"<<s <<"' in hash #"<<index<<std::endl;
+		ignoreWord* iW = new ignoreWord;
+		iW->word = s;
+		iW->next = stopWordHash[index];
+		stopWordHash[index] = iW;
+	}
+};
+bool searchalgo::isStopWord(std::string s){
+	for (int i = 0;i<s.length();i++){
+		s[i] = ((s[i]>=97)*s[i]+(s[i]<97)*(s[i]+32));
+	}
+	int index = ((s[0]>=97)*s[0]+(s[0]<97)*(s[0]+32))-97;
+	//std::cout<<s<<": searching in "<<index<<" hash"<<std::endl;
+	ignoreWord* head= stopWordHash[index];
+	if (head == NULL){
+		return false;
+	}
+	bool found = false;
+	while (head!= NULL) {
+		//std::cout<<s<<std::endl;
+		if (head->word == s){
+			found = true;
+			break;
 		}
-		//std::cout <<word[(a[i]>b[i])] <<" comes first" << '\n';
-		return (a[i]>b[i]);
+		head = head->next;
 	}
-	//std::cout <<word[small] <<" comes first" << '\n';
-	return small;
-}
-
+	return found;
+};
 keywordsbst* searchalgo::getKeyWordPoint(std::string keyword){
 	//std::cout << "finding keyword "<<keyword << '\n';
 	keywordsbst* check = root;
@@ -404,22 +419,6 @@ keywordsbst* searchalgo::getKeyWordPoint(std::string keyword){
 		continue;
 	}
 	return NULL;
-}
-
-int hashreturn(std::string s){
-	return (s.length()+s[0]+s[s.length()])%57;
-}
-
-bool priorityFirst(vid* a, vid* b){
-	if (a->count == b->count){
-		return (a->recScore > b->recScore);
-	}
-	return (a->count> b->count);
-}
-void clearscreen(){
-	for (int i = 0;i<100;i++){
-		std::cout << "" << '\n';
-	}
 }
 void searchalgo::printmenu(){
 	clearscreen();
@@ -439,7 +438,6 @@ void searchalgo::printmenu(){
 	std::cout << "| 3. Change # of recommendation |" << '\n';
 	std::cout << "| 4. Quit                       |" << '\n';
 }
-
 void searchalgo::printVideoDetail(vid* check){
 	std::cout << "_____________________________________________________________" << '\n';
 	std::cout << check->title << " By "<<check->refNode->creator<< '\n';
@@ -528,7 +526,7 @@ int p;
 			rank++;
 			l = l->n;
 		}
-		std::cin >> p;
+		//std::cin >> p;
 		vid* point = tempQueue[i];
 		std::cout << point->title << '\n';
 		std::cout << "		"<<point->count << '\n';
@@ -580,23 +578,6 @@ int p;
 	}
 	printmenu();
 }
-void dealoctree(keywordsbst* root){
-	if (root==NULL){
-		return;
-	}
-	dealoctree(root->l);
-	dealoctree(root->r);
-	videoll* check = root->head;
-	while(check!=NULL){
-		std::cout << "Deleting video: " <<check->title << '\n';
-		root->head = check->next;
-		delete check;
-		check = root->head;
-	}
-	std::cout << "Deleting Keyword: "<<root->keyword << '\n';
-	delete root;
-}
-
 void searchalgo::printallinfo() {
 	vid* check = queue;
 	int c = 1;
@@ -606,7 +587,6 @@ void searchalgo::printallinfo() {
 		c++;
 	}
 }
-
 searchalgo::~searchalgo(){
 		for (int i = 0;i<57;i++){
 			if (VideoHash[i]==NULL){
